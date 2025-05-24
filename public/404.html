@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Página no encontrada - Portfolio Simulator</title>
+  <script>
+    // Redirigir a la página principal manteniendo la ruta para SPA
+    const segment = 1;
+    const url = window.location.pathname;
+    const repo = '/Portfolio-Simulator';
+    
+    const redirectTo = `${window.location.origin}${repo}/?path=${url.slice(segment + repo.length)}`;
+    window.location.replace(redirectTo);
+  </script>
+  <style>
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background: linear-gradient(to bottom right, #f8fafc, #e0f2fe);
+      color: #334155;
+      text-align: center;
+    }
+    .container {
+      max-width: 600px;
+      padding: 2rem;
+    }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      background: linear-gradient(to right, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    p {
+      margin-bottom: 2rem;
+    }
+    .loader {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-left-color: #667eea;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Redirigiendo...</h1>
+    <p>Estás siendo redirigido a la página principal de Portfolio Simulator.</p>
+    <div class="loader"></div>
+  </div>
+</body>
+</html>

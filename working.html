@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Simulator - Working Version</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'portfolio-primary': '#667eea',
+                        'portfolio-secondary': '#764ba2'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 p-4">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-4xl font-bold text-center mb-8 text-portfolio-primary">Portfolio Simulator</h1>
+        
+        <div class="grid md:grid-cols-2 gap-8">
+            <!-- Panel de Control -->
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold mb-6">Parámetros de Simulación</h2>
+                
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Retorno X (%)</label>
+                            <input type="number" id="meanX" value="8" class="w-full border rounded px-3 py-2">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Volatilidad X (%)</label>
+                            <input type="number" id="stdX" value="20" class="w-full border rounded px-3 py-2">
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Retorno Y (%)</label>
+                            <input type="number" id="meanY" value="12" class="w-full border rounded px-3 py-2">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Volatilidad Y (%)</label>
+                            <input type="number" id="stdY" value="30" class="w-full border rounded px-3 py-2">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium mb-2">
+                            Peso Activo X: <span id="weightDisplay" class="font-bold text-portfolio-primary">60%</span>
+                        </label>
+                        <input type="range" id="weightSlider" min="0" max="100" value="60" 
+                               class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Número de Simulaciones</label>
+                        <select id="numSims" class="w-full border rounded px-3 py-2">
+                            <option value="1000">1,000</option>
+                            <option value="5000">5,000</option>
+                            <option value="10000" selected>10,000</option>
+                            <option value="50000">50,000</option>
+                        </select>
+                    </div>
+                    
+                    <button onclick="ejecutarSimulacion()" 
+                            class="w-full bg-portfolio-primary text-white py-3 px-4 rounded-lg font-semibold hover:opacity-90 transition-opacity">
+                        🚀 Ejecutar Simulación Monte Carlo
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Panel de Resultados -->
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold mb-6">Resultados</h2>
+                
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="text-center p-4 bg-green-50 rounded-lg">
+                        <div class="text-sm text-gray-600 mb-1">Retorno Esperado</div>
+                        <div id="retornoEsperado" class="text-2xl font-bold text-green-600">-</div>
+                    </div>
+                    <div class="text-center p-4 bg-red-50 rounded-lg">
+                        <div class="text-sm text-gray-600 mb-1">Volatilidad</div>
+                        <div id="volatilidad" class="text-2xl font-bold text-red-600">-</div>
+                    </div>
+                    <div class="text-center p-4 bg-blue-50 rounded-lg">
+                        <div class="text-sm text-gray-600 mb-1">Ratio Sharpe</div>
+                        <div id="ratioSharpe" class="text-2xl font-bold text-blue-600">-</div>
+                    </div>
+                    <div class="text-center p-4 bg-yellow-50 rounded-lg">
+                        <div class="text-sm text-gray-600 mb-1">VaR 95%</div>
+                        <div id="var95" class="text-2xl font-bold text-yellow-600">-</div>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <h3 class="text-lg font-medium mb-2">Composición del Portfolio</h3>
+                    <div id="composicion" class="text-sm text-gray-600">
+                        60% Activo X + 40% Activo Y
+                    </div>
+                </div>
+                
+                <div id="interpretacion" class="bg-gray-50 p-4 rounded-lg">
+                    <h4 class="font-medium mb-2">💡 Interpretación</h4>
+                    <p class="text-sm text-gray-600">Ejecuta una simulación para ver el análisis.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-8 bg-white p-6 rounded-lg shadow-lg">
+            <h3 class="text-xl font-semibold mb-4">Distribución de Retornos</h3>
+            <div id="histograma" class="h-64 bg-gray-100 rounded flex items-center justify-center">
+                <span class="text-gray-500">El gráfico aparecerá después de la simulación</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('🚀 Portfolio Simulator cargado correctamente');
+        
+        // Actualizar display del peso
+        document.getElementById('weightSlider').addEventListener('input', function() {
+            const peso = this.value;
+            document.getElementById('weightDisplay').textContent = peso + '%';
+            document.getElementById('composicion').textContent = 
+                `${peso}% Activo X + ${100-peso}% Activo Y`;
+        });
+        
+        // Función principal de simulación
+        function ejecutarSimulacion() {
+            console.log('Iniciando simulación...');
+            
+            try {
+                // Obtener parámetros
+                const meanX = parseFloat(document.getElementById('meanX').value) / 100;
+                const stdX = parseFloat(document.getElementById('stdX').value) / 100;
+                const meanY = parseFloat(document.getElementById('meanY').value) / 100;
+                const stdY = parseFloat(document.getElementById('stdY').value) / 100;
+                const pesoX = parseFloat(document.getElementById('weightSlider').value) / 100;
+                const pesoY = 1 - pesoX;
+                const numSims = parseInt(document.getElementById('numSims').value);
+                
+                console.log('Parámetros:', {meanX, stdX, meanY, stdY, pesoX, pesoY, numSims});
+                
+                // Ejecutar Monte Carlo
+                const resultados = simularMonteCarlo(meanX, stdX, meanY, stdY, pesoX, pesoY, numSims);
+                
+                // Actualizar resultados
+                actualizarResultados(resultados, pesoX, pesoY);
+                
+                console.log('✅ Simulación completada:', resultados);
+                
+            } catch (error) {
+                console.error('❌ Error en simulación:', error);
+                alert('Error en la simulación: ' + error.message);
+            }
+        }
+        
+        // Simulación Monte Carlo
+        function simularMonteCarlo(meanX, stdX, meanY, stdY, pesoX, pesoY, numSims) {
+            const retornosPortfolio = [];
+            
+            for (let i = 0; i < numSims; i++) {
+                const x = generarNormal(meanX, stdX);
+                const y = generarNormal(meanY, stdY);
+                const portfolio = pesoX * x + pesoY * y;
+                retornosPortfolio.push(portfolio);
+            }
+            
+            // Calcular estadísticas
+            const media = retornosPortfolio.reduce((sum, r) => sum + r, 0) / numSims;
+            const varianza = retornosPortfolio.reduce((sum, r) => sum + Math.pow(r - media, 2), 0) / (numSims - 1);
+            const desviacion = Math.sqrt(varianza);
+            const sharpe = media / desviacion;
+            
+            // VaR 95%
+            retornosPortfolio.sort((a, b) => a - b);
+            const var95 = retornosPortfolio[Math.floor(0.05 * numSims)];
+            
+            return {
+                retornoEsperado: media,
+                volatilidad: desviacion,
+                ratioSharpe: sharpe,
+                var95: var95,
+                distribución: retornosPortfolio
+            };
+        }
+        
+        // Generar número aleatorio normal (Box-Muller)
+        function generarNormal(media = 0, desviacion = 1) {
+            let u = 0, v = 0;
+            while(u === 0) u = Math.random();
+            while(v === 0) v = Math.random();
+            
+            const z = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+            return z * desviacion + media;
+        }
+        
+        // Actualizar UI con resultados
+        function actualizarResultados(resultados, pesoX, pesoY) {
+            document.getElementById('retornoEsperado').textContent = 
+                (resultados.retornoEsperado * 100).toFixed(2) + '%';
+            
+            document.getElementById('volatilidad').textContent = 
+                (resultados.volatilidad * 100).toFixed(2) + '%';
+            
+            document.getElementById('ratioSharpe').textContent = 
+                resultados.ratioSharpe.toFixed(3);
+            
+            document.getElementById('var95').textContent = 
+                (resultados.var95 * 100).toFixed(2) + '%';
+            
+            // Interpretación
+            let interpretacion = `
+                <h4 class="font-medium mb-2">💡 Análisis del Portfolio</h4>
+                <p class="text-sm mb-2">
+                    <strong>Composición:</strong> ${(pesoX*100).toFixed(0)}% Activo X + ${(pesoY*100).toFixed(0)}% Activo Y
+                </p>
+                <p class="text-sm mb-2">
+                    <strong>Retorno esperado:</strong> ${(resultados.retornoEsperado*100).toFixed(2)}% anual
+                </p>
+                <p class="text-sm mb-2">
+                    <strong>Riesgo:</strong> ${(resultados.volatilidad*100).toFixed(2)}% de volatilidad
+                </p>
+                <p class="text-sm">
+                    <strong>Ratio Sharpe:</strong> ${resultados.ratioSharpe.toFixed(3)} 
+                    ${resultados.ratioSharpe > 1 ? '(Excelente)' : resultados.ratioSharpe > 0.5 ? '(Bueno)' : '(Mejorable)'}
+                </p>
+            `;
+            
+            document.getElementById('interpretacion').innerHTML = interpretacion;
+            
+            // Crear histograma simple
+            crearHistograma(resultados.distribución);
+        }
+        
+        // Crear histograma básico
+        function crearHistograma(datos) {
+            const contenedor = document.getElementById('histograma');
+            
+            // Crear bins
+            const numBins = 20;
+            const min = Math.min(...datos);
+            const max = Math.max(...datos);
+            const rango = max - min;
+            const tamañoBin = rango / numBins;
+            
+            const bins = new Array(numBins).fill(0);
+            
+            datos.forEach(valor => {
+                const binIndex = Math.min(Math.floor((valor - min) / tamañoBin), numBins - 1);
+                bins[binIndex]++;
+            });
+            
+            const maxFreq = Math.max(...bins);
+            
+            // Crear barras
+            let html = '<div class="flex items-end justify-center h-full space-x-1">';
+            bins.forEach((freq, i) => {
+                const altura = (freq / maxFreq) * 80;
+                const valor = (min + i * tamañoBin);
+                html += `
+                    <div class="bg-portfolio-primary rounded-t" 
+                         style="height: ${altura}%; width: 12px;" 
+                         title="Retorno: ${(valor*100).toFixed(1)}%, Frecuencia: ${freq}">
+                    </div>
+                `;
+            });
+            html += '</div>';
+            
+            contenedor.innerHTML = html;
+        }
+        
+        console.log('✅ Todas las funciones cargadas correctamente');
+    </script>
+</body>
+</html>

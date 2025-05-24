@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Simulator - Debug</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .card { @apply bg-white rounded-lg shadow-md p-6; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold mb-8 text-center">Portfolio Simulator</h1>
+        
+        <div class="grid md:grid-cols-2 gap-8">
+            <!-- Inputs -->
+            <div class="card">
+                <h3 class="text-xl font-semibold mb-4">Parámetros</h3>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Retorno X</label>
+                        <input type="number" id="meanX" value="0.08" step="0.01" class="w-full border rounded px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Volatilidad X</label>
+                        <input type="number" id="stdX" value="0.20" step="0.01" class="w-full border rounded px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Retorno Y</label>
+                        <input type="number" id="meanY" value="0.12" step="0.01" class="w-full border rounded px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Volatilidad Y</label>
+                        <input type="number" id="stdY" value="0.30" step="0.01" class="w-full border rounded px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Peso A: <span id="weightAValue">60%</span></label>
+                        <input type="range" id="weightA" min="0" max="1" step="0.01" value="0.6" class="w-full">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Simulaciones</label>
+                        <input type="number" id="numSims" value="10000" class="w-full border rounded px-3 py-2">
+                    </div>
+                    
+                    <button onclick="runSimulation()" class="w-full bg-blue-600 text-white py-3 rounded font-semibold hover:bg-blue-700">
+                        🚀 Ejecutar Simulación
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Results -->
+            <div class="card">
+                <h3 class="text-xl font-semibold mb-4">Resultados</h3>
+                
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="text-center">
+                        <div class="text-sm text-gray-600">Retorno</div>
+                        <div id="portfolioReturn" class="text-2xl font-bold">-</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-sm text-gray-600">Riesgo</div>
+                        <div id="portfolioRisk" class="text-2xl font-bold">-</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-sm text-gray-600">Sharpe</div>
+                        <div id="sharpeRatio" class="text-2xl font-bold">-</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-sm text-gray-600">VaR 95%</div>
+                        <div id="var95" class="text-2xl font-bold">-</div>
+                    </div>
+                </div>
+                
+                <div style="height: 200px;">
+                    <canvas id="distributionChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Actualizar slider
+        document.getElementById('weightA').addEventListener('input', function() {
+            document.getElementById('weightAValue').textContent = Math.round(this.value * 100) + '%';
+        });
+        
+        // Simulación
+        function runSimulation() {
+            console.log('Ejecutando simulación...');
+            
+            const meanX = parseFloat(document.getElementById('meanX').value);
+            const stdX = parseFloat(document.getElementById('stdX').value);
+            const meanY = parseFloat(document.getElementById('meanY').value);
+            const stdY = parseFloat(document.getElementById('stdY').value);
+            const weightA = parseFloat(document.getElementById('weightA').value);
+            const weightB = 1 - weightA;
+            const numSims = parseInt(document.getElementById('numSims').value);
+            
+            // Monte Carlo
+            const portfolioReturns = [];
+            for(let i = 0; i < numSims; i++) {
+                const x = normalRandom(meanX, stdX);
+                const y = normalRandom(meanY, stdY);
+                portfolioReturns.push(weightA * x + weightB * y);
+            }
+            
+            // Estadísticas
+            const mean = portfolioReturns.reduce((a, b) => a + b) / portfolioReturns.length;
+            const variance = portfolioReturns.reduce((a, b) => a + Math.pow(b - mean, 2)) / portfolioReturns.length;
+            const std = Math.sqrt(variance);
+            const sharpe = mean / std;
+            
+            portfolioReturns.sort((a, b) => a - b);
+            const var95 = portfolioReturns[Math.floor(0.05 * portfolioReturns.length)];
+            
+            // Actualizar UI
+            document.getElementById('portfolioReturn').textContent = (mean * 100).toFixed(2) + '%';
+            document.getElementById('portfolioRisk').textContent = (std * 100).toFixed(2) + '%';
+            document.getElementById('sharpeRatio').textContent = sharpe.toFixed(3);
+            document.getElementById('var95').textContent = (var95 * 100).toFixed(2) + '%';
+            
+            // Gráfico simple
+            createChart(portfolioReturns);
+        }
+        
+        function normalRandom(mean = 0, std = 1) {
+            let u = 0, v = 0;
+            while(u === 0) u = Math.random();
+            while(v === 0) v = Math.random();
+            
+            const z = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+            return z * std + mean;
+        }
+        
+        function createChart(data) {
+            const canvas = document.getElementById('distributionChart');
+            const ctx = canvas.getContext('2d');
+            
+            // Crear histograma
+            const bins = 30;
+            const min = Math.min(...data);
+            const max = Math.max(...data);
+            const binSize = (max - min) / bins;
+            
+            const histogram = new Array(bins).fill(0);
+            const labels = [];
+            
+            for(let i = 0; i < bins; i++) {
+                labels.push((min + i * binSize).toFixed(3));
+            }
+            
+            data.forEach(value => {
+                const binIndex = Math.min(Math.floor((value - min) / binSize), bins - 1);
+                histogram[binIndex]++;
+            });
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Distribución',
+                        data: histogram,
+                        backgroundColor: 'rgba(54, 162, 235, 0.7)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+    </script>
+</body>
+</html>
