@@ -31,13 +31,36 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Create dist directory
+        run: mkdir -p dist
+      - name: Build Tailwind CSS
+        run: npx tailwindcss -i ./src/styles/main.css -o ./dist/output.css --minify
+      - name: Copy index.html to dist
+        run: cp index.html dist/
+      - name: Update CSS path in index.html
+        run: |
+          sed -i 's|<link href="./src/styles/main.css" rel="stylesheet">|<link href="./output.css" rel="stylesheet"><link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.0/dist/tailwind.min.css" rel="stylesheet">|g' dist/index.html
+      - name: Update JS path in index.html
+        run: |
+          sed -i 's|<script type="module" src="/src/scripts/main.js"></script>|<script type="module" src="./main.js"></script>|g' dist/index.html
+      - name: Copy JS files to dist
+        run: |
+          mkdir -p dist/scripts
+          cp -r src/scripts/* dist/
       - name: Setup Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v4
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload entire repository
-          path: '.'
+          # Upload dist directory
+          path: './dist'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
