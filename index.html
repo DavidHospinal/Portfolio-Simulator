@@ -4,16 +4,113 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simulador de Portfolio - Variables Aleatorias</title>
+    
+    <!-- CDN Dependencies - Updated with reliable sources -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <script type="module" crossorigin src="/assets/index-D_24vjZq.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index-ByjTPjhb.css">
+    
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'portfolio-primary': '#667eea',
+                        'portfolio-secondary': '#764ba2',
+                        'portfolio-accent': '#f093fb',
+                        'finance-bull': '#10b981',
+                        'finance-bear': '#ef4444',
+                        'finance-neutral': '#6b7280'
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'sans-serif'],
+                        'mono': ['JetBrains Mono', 'monospace']
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-up': 'slideUp 0.3s ease-out'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Custom Styles -->
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { transform: translateY(10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(to right, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .card {
+            @apply bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 dark:border-slate-700/50;
+        }
+        
+        .btn {
+            @apply font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 focus:outline-none focus:ring-4;
+        }
+        
+        .btn-primary {
+            @apply bg-gradient-to-r from-portfolio-primary to-portfolio-secondary text-white focus:ring-portfolio-primary/25 shadow-md;
+            background-image: linear-gradient(to right, #4f46e5, #6366f1);
+        }
+        
+        .btn-secondary {
+            @apply bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600;
+        }
+        
+        .btn-outline {
+            @apply border-2 border-portfolio-primary text-portfolio-primary hover:bg-portfolio-primary hover:text-white;
+        }
+        
+        .btn-sm {
+            @apply py-2 px-4 text-sm;
+        }
+        
+        .input {
+            @apply w-full px-4 py-3 bg-white/50 dark:bg-slate-700/50 border-2 border-gray-200 dark:border-slate-600 rounded-xl focus:border-portfolio-primary dark:focus:border-portfolio-accent focus:ring-4 focus:ring-portfolio-primary/10 transition-all duration-200 outline-none text-slate-800 dark:text-white;
+        }
+        
+        .metric-card {
+            @apply card p-6 text-center transform hover:scale-105 transition-transform duration-200;
+        }
+        
+        .slider {
+            @apply bg-gradient-to-r from-portfolio-primary to-portfolio-secondary;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            @apply appearance-none w-4 h-4 bg-white rounded-full shadow-lg cursor-pointer;
+        }
+    </style>
 </head>
-<body class="antialiased">
+<body class="antialiased bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800">
     <div id="app">
-        <!-- Mensajes de estado -->
+        <!-- Status Messages -->
         <div id="success-message" class="fixed top-4 right-4 z-50 px-6 py-3 rounded-lg bg-green-500 text-white font-medium shadow-lg transform transition-all duration-300 translate-x-full"></div>
         <div id="error-message" class="fixed top-4 right-4 z-50 px-6 py-3 rounded-lg bg-red-500 text-white font-medium shadow-lg transform transition-all duration-300 translate-x-full"></div>
-        
+
         <!-- Header with Navigation -->
         <header class="sticky top-0 z-40 glass-effect">
             <nav class="container mx-auto px-6 py-4">
@@ -49,7 +146,7 @@
                         <h3 class="text-xl font-semibold mb-6 flex items-center">
                             📊 <span class="ml-2">Activos Financieros</span>
                         </h3>
-                        
+
                         <!-- Asset X -->
                         <div class="space-y-4 mb-6">
                             <h4 class="font-medium text-portfolio-primary">Activo X</h4>
@@ -64,7 +161,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- Asset Y -->
                         <div class="space-y-4">
                             <h4 class="font-medium text-portfolio-secondary">Activo Y</h4>
@@ -86,7 +183,7 @@
                         <h3 class="text-xl font-semibold mb-6 flex items-center">
                             ⚖️ <span class="ml-2">Pesos del Portfolio</span>
                         </h3>
-                        
+
                         <div class="space-y-4">
                             <div class="flex items-center mb-4">
                                 <input type="checkbox" id="financialPerspective" class="rounded text-portfolio-primary focus:ring-portfolio-primary">
@@ -94,7 +191,7 @@
                                     💰 Activar Perspectiva Financiera
                                 </label>
                             </div>
-                            
+
                             <div id="financialInfo" class="hidden bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 p-4 mb-4 text-sm">
                                 <h4 class="font-bold mb-2">Interpretación Financiera:</h4>
                                 <ul class="space-y-1">
@@ -104,10 +201,10 @@
                                     <li>• <strong>Pesos negativos</strong>: Posiciones cortas (ej: 150% largo - 50% corto)</li>
                                 </ul>
                             </div>
-                            
+
                             <div>
                                 <label for="weightA" class="block text-sm font-medium mb-2">Peso A (Activo X)</label>
-                                <input type="range" id="weightA" min="0" max="1" step="0.1" value="0.6" 
+                                <input type="range" id="weightA" min="0" max="1" step="0.1" value="0.6"
                                        class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider">
                                 <div class="flex justify-between text-sm text-gray-500 mt-1">
                                     <span>0%</span>
@@ -115,10 +212,10 @@
                                     <span>100%</span>
                                 </div>
                             </div>
-                            
+
                             <div>
                                 <label for="weightB" class="block text-sm font-medium mb-2">Peso B (Activo Y)</label>
-                                <input type="range" id="weightB" min="0" max="1" step="0.1" value="0.4" 
+                                <input type="range" id="weightB" min="0" max="1" step="0.1" value="0.4"
                                        class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider">
                                 <div class="flex justify-between text-sm text-gray-500 mt-1">
                                     <span>0%</span>
@@ -142,12 +239,12 @@
                                     <option value="100000">100,000</option>
                                 </select>
                             </div>
-                            
-                            <button id="runSimulation" class="btn btn-primary w-full">
+
+                            <button id="runSimulation" class="btn btn-primary w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200">
                                 🚀 Ejecutar Simulación
                             </button>
-                            
-                            <!-- Características Avanzadas -->
+
+                            <!-- Advanced Features -->
                             <div class="mt-4">
                                 <div class="flex justify-between items-center mb-2">
                                     <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300">⚙️ Características Avanzadas</h4>
@@ -155,9 +252,9 @@
                                         Mostrar
                                     </button>
                                 </div>
-                                
+
                                 <div id="advancedFeaturesPanel" class="hidden space-y-4 mt-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                                    <!-- Presets de Portfolio -->
+                                    <!-- Portfolio Presets -->
                                     <div>
                                         <label for="portfolioPreset" class="block text-xs font-medium mb-1">Presets de Portfolio</label>
                                         <select id="portfolioPreset" class="input text-sm py-1">
@@ -169,23 +266,23 @@
                                             <option value="cobertura">Cobertura</option>
                                         </select>
                                     </div>
-                                    
-                                    <!-- Guardar Configuración -->
+
+                                    <!-- Save Configuration -->
                                     <div class="flex space-x-2">
                                         <input type="text" id="configName" placeholder="Nombre de la configuración" class="input text-sm py-1 flex-grow">
                                         <button id="saveConfig" class="btn btn-sm btn-secondary py-1 px-2 text-xs">
                                             💾 Guardar
                                         </button>
                                     </div>
-                                    
-                                    <!-- Historial -->
+
+                                    <!-- History -->
                                     <div>
                                         <button id="showHistory" class="btn btn-sm btn-outline w-full text-xs py-1">
                                             📜 Historial de Simulaciones
                                         </button>
                                     </div>
-                                    
-                                    <!-- Comparación -->
+
+                                    <!-- Comparison -->
                                     <div>
                                         <button id="compareScenarios" class="btn btn-sm btn-outline w-full text-xs py-1">
                                             🔄 Comparar Escenarios
@@ -223,8 +320,8 @@
                     <div class="card p-6">
                         <div class="flex justify-between items-center mb-6">
                             <h3 class="text-xl font-semibold">📈 Distribución de Retornos</h3>
-                            
-                            <!-- Botones de exportación -->
+
+                            <!-- Export buttons -->
                             <div class="flex space-x-2">
                                 <div class="relative inline-block">
                                     <button id="exportButton" class="btn btn-sm btn-outline flex items-center">
@@ -254,21 +351,6 @@
                                                 Exportar a JSON
                                             </button>
                                         </div>
-                                        <div class="border-t border-gray-200 dark:border-gray-700"></div>
-                                        <div class="py-1">
-                                            <button id="shareTwitter" class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-blue-400" viewBox="0 0 24 24" fill="currentColor">
-                                                    <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723 10.1 10.1 0 01-3.127 1.184 4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
-                                                </svg>
-                                                Compartir en Twitter
-                                            </button>
-                                            <button id="shareLinkedIn" class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-blue-600" viewBox="0 0 24 24" fill="currentColor">
-                                                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                                                </svg>
-                                                Compartir en LinkedIn
-                                            </button>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -289,11 +371,11 @@
                                 Cambiar vista
                             </button>
                         </div>
-                        
-                        <!-- Contenedor para mensajes de error -->
+
+                        <!-- Error container -->
                         <div id="errorContainer" class="mb-4"></div>
-                        
-                        <!-- Vista de matriz -->
+
+                        <!-- Matrix view -->
                         <div id="matrixView" class="overflow-x-auto">
                             <table class="min-w-full bg-white dark:bg-gray-800 rounded-lg overflow-hidden">
                                 <thead>
@@ -325,8 +407,8 @@
                                     </tr>
                                 </tbody>
                             </table>
-                            
-                            <!-- Leyenda -->
+
+                            <!-- Legend -->
                             <div class="mt-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
                                 <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Leyenda:</h4>
                                 <ul class="text-xs text-gray-600 dark:text-gray-400 space-y-1">
@@ -345,8 +427,8 @@
                                 </ul>
                             </div>
                         </div>
-                        
-                        <!-- Vista de lista (inicialmente oculta) -->
+
+                        <!-- List view (initially hidden) -->
                         <div id="listView" class="hidden">
                             <div class="space-y-3">
                                 <div class="p-3 bg-white dark:bg-gray-800 rounded-lg shadow">
@@ -354,19 +436,19 @@
                                     <p id="varXLabel" class="text-2xl font-mono text-blue-600 dark:text-blue-400">0.0000</p>
                                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Mide la dispersión de los retornos del Activo X</p>
                                 </div>
-                                
+
                                 <div class="p-3 bg-white dark:bg-gray-800 rounded-lg shadow">
                                     <h4 class="font-medium text-gray-900 dark:text-white">Varianza del Activo Y</h4>
                                     <p id="varYLabel" class="text-2xl font-mono text-blue-600 dark:text-blue-400">0.0000</p>
                                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Mide la dispersión de los retornos del Activo Y</p>
                                 </div>
-                                
+
                                 <div class="p-3 bg-white dark:bg-gray-800 rounded-lg shadow">
                                     <h4 class="font-medium text-gray-900 dark:text-white">Varianza del Portfolio</h4>
                                     <p id="varPortLabel" class="text-2xl font-mono text-blue-600 dark:text-blue-400">0.0000</p>
                                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Mide el riesgo total del portfolio</p>
                                 </div>
-                                
+
                                 <div class="p-3 bg-white dark:bg-gray-800 rounded-lg shadow">
                                     <h4 class="font-medium text-gray-900 dark:text-white">Covarianza entre X e Y</h4>
                                     <p id="covXYLabel" class="text-2xl font-mono text-gray-700 dark:text-gray-300">0.0000</p>
@@ -375,35 +457,6 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <script>
-                        // Toggle entre vistas de matriz y lista
-                        document.getElementById('toggleMatrixView').addEventListener('click', function() {
-                            const matrixView = document.getElementById('matrixView');
-                            const listView = document.getElementById('listView');
-                            const button = document.getElementById('toggleMatrixView');
-                            
-                            if (matrixView.classList.contains('hidden')) {
-                                matrixView.classList.remove('hidden');
-                                listView.classList.add('hidden');
-                                button.innerHTML = `
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                                    </svg>
-                                    Cambiar vista
-                                `;
-                            } else {
-                                matrixView.classList.add('hidden');
-                                listView.classList.remove('hidden');
-                                button.innerHTML = `
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                                    </svg>
-                                    Ver matriz
-                                `;
-                            }
-                        });
-                    </script>
 
                     <!-- Interpretation -->
                     <div id="interpretation" class="card p-6 border-l-4 border-portfolio-primary">
@@ -415,6 +468,919 @@
         </main>
     </div>
 
-    <!-- Scripts -->
+    <!-- Integrated JavaScript - All functionality combined -->
+    <script>
+        console.log('🚀 Portfolio Simulator cargado correctamente');
+        
+        // Global variables
+        let distributionChart = null;
+        let lastSimulationResults = null;
+        
+        // === DARK MODE FUNCTIONALITY ===
+        function initializeDarkMode() {
+            try {
+                console.log('Inicializando modo oscuro...');
+                const darkModeToggle = document.getElementById('darkModeToggle');
+                if (!darkModeToggle) return false;
+
+                const applyTheme = (isDark) => {
+                    const html = document.documentElement;
+                    if (isDark) {
+                        html.classList.add('dark');
+                        darkModeToggle.innerHTML = '☀️';
+                        darkModeToggle.setAttribute('aria-label', 'Cambiar a modo claro');
+                    } else {
+                        html.classList.remove('dark');
+                        darkModeToggle.innerHTML = '🌙';
+                        darkModeToggle.setAttribute('aria-label', 'Cambiar a modo oscuro');
+                    }
+                };
+
+                // Get stored preference or use system preference
+                let theme;
+                try {
+                    theme = localStorage.getItem('theme');
+                } catch (error) {
+                    console.warn('No se pudo acceder a localStorage:', error);
+                }
+
+                const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                const isDark = theme === 'dark' || (!theme && systemDark);
+                applyTheme(isDark);
+
+                darkModeToggle.addEventListener('click', () => {
+                    const isDark = !document.documentElement.classList.contains('dark');
+                    const newTheme = isDark ? 'dark' : 'light';
+                    applyTheme(isDark);
+                    try {
+                        localStorage.setItem('theme', newTheme);
+                    } catch (error) {
+                        console.warn('No se pudo guardar la preferencia del tema:', error);
+                    }
+                });
+
+                return true;
+            } catch (error) {
+                console.error('Error al inicializar el modo oscuro:', error);
+                return false;
+            }
+        }
+
+        // === MESSAGE FUNCTIONS ===
+        function showSuccess(message, duration = 3000) {
+            console.log('Éxito:', message);
+            try {
+                let successElement = document.getElementById('success-message');
+                successElement.textContent = message;
+                successElement.classList.remove('translate-x-full');
+                successElement.classList.add('translate-x-0');
+
+                if (duration > 0) {
+                    if (window.successMessageTimeout) {
+                        clearTimeout(window.successMessageTimeout);
+                    }
+                    window.successMessageTimeout = setTimeout(() => {
+                        successElement.classList.remove('translate-x-0');
+                        successElement.classList.add('translate-x-full');
+                    }, duration);
+                }
+                return true;
+            } catch (error) {
+                console.error('Error en showSuccess:', error);
+                return false;
+            }
+        }
+
+        function showError(message, duration = 5000) {
+            const errorMessage = message instanceof Error ? message.message : String(message);
+            console.error('Error:', errorMessage);
+            try {
+                let errorElement = document.getElementById('error-message');
+                errorElement.textContent = errorMessage;
+                errorElement.classList.remove('translate-x-full');
+                errorElement.classList.add('translate-x-0');
+
+                if (duration > 0) {
+                    if (window.errorMessageTimeout) {
+                        clearTimeout(window.errorMessageTimeout);
+                    }
+                    window.errorMessageTimeout = setTimeout(() => {
+                        errorElement.classList.remove('translate-x-0');
+                        errorElement.classList.add('translate-x-full');
+                    }, duration);
+                }
+                return true;
+            } catch (error) {
+                console.error('Error al mostrar el mensaje de error:', error);
+                return false;
+            }
+        }
+
+        // === SIMULATION FUNCTIONS ===
+        function generateNormalRandom(mean = 0, std = 1) {
+            let u = 0, v = 0;
+            while(u === 0) u = Math.random();
+            while(v === 0) v = Math.random();
+            const z = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+            return z * std + mean;
+        }
+
+        function runMonteCarloSimulation(meanX, stdX, meanY, stdY, weightA, weightB, numSims) {
+            const xReturns = [];
+            const yReturns = [];
+            const portfolioReturns = [];
+
+            for (let i = 0; i < numSims; i++) {
+                const x = generateNormalRandom(meanX, stdX);
+                const y = generateNormalRandom(meanY, stdY);
+                const portfolio = weightA * x + weightB * y;
+
+                xReturns.push(x);
+                yReturns.push(y);
+                portfolioReturns.push(portfolio);
+            }
+
+            return calculateStatistics(xReturns, yReturns, portfolioReturns);
+        }
+
+        function calculateStatistics(xReturns, yReturns, portfolioReturns) {
+            const n = xReturns.length;
+
+            const meanX = xReturns.reduce((sum, x) => sum + x, 0) / n;
+            const meanY = yReturns.reduce((sum, y) => sum + y, 0) / n;
+            const meanPortfolio = portfolioReturns.reduce((sum, r) => sum + r, 0) / n;
+
+            const varX = xReturns.reduce((sum, x) => sum + Math.pow(x - meanX, 2), 0) / (n - 1);
+            const varY = yReturns.reduce((sum, y) => sum + Math.pow(y - meanY, 2), 0) / (n - 1);
+            const varPortfolio = portfolioReturns.reduce((sum, r) => sum + Math.pow(r - meanPortfolio, 2), 0) / (n - 1);
+
+            const covXY = xReturns.reduce((sum, x, i) => {
+                return sum + (x - meanX) * (yReturns[i] - meanY);
+            }, 0) / (n - 1);
+
+            const sharpeRatio = meanPortfolio / Math.sqrt(varPortfolio);
+            const sortedReturns = [...portfolioReturns].sort((a, b) => a - b);
+            const var95 = sortedReturns[Math.floor(0.05 * n)];
+
+            return {
+                xReturns,
+                yReturns,
+                portfolioReturns,
+                meanX,
+                meanY,
+                meanPortfolio,
+                varX,
+                varY,
+                varPortfolio,
+                covXY,
+                stdX: Math.sqrt(varX),
+                stdY: Math.sqrt(varY),
+                stdPortfolio: Math.sqrt(varPortfolio),
+                sharpeRatio,
+                var95
+            };
+        }
+
+        async function runSimulation() {
+            console.log('Iniciando simulación...');
+            const runButton = document.getElementById('runSimulation');
+            const originalButtonText = runButton.innerHTML;
+            
+            try {
+                runButton.disabled = true;
+                runButton.innerHTML = '⌛ Procesando...';
+
+                const getValue = (id) => {
+                    const element = document.getElementById(id);
+                    if (!element) throw new Error(`No se encontró el elemento con ID: ${id}`);
+                    return parseFloat(element.value);
+                };
+
+                const meanX = getValue('meanX');
+                const stdX = getValue('stdX');
+                const meanY = getValue('meanY');
+                const stdY = getValue('stdY');
+                const weightA = getValue('weightA');
+                const weightB = getValue('weightB');
+                const numSims = parseInt(document.getElementById('numSims')?.value || '1000');
+
+                if (isNaN(meanX) || isNaN(stdX) || isNaN(meanY) || isNaN(stdY) ||
+                    isNaN(weightA) || isNaN(weightB) || isNaN(numSims)) {
+                    throw new Error('Por favor, ingrese valores válidos en todos los campos.');
+                }
+
+                const totalWeight = weightA + weightB;
+                if (totalWeight === 0) {
+                    throw new Error('La suma de los pesos no puede ser cero.');
+                }
+
+                const normalizedWeightA = weightA / totalWeight;
+                const normalizedWeightB = weightB / totalWeight;
+
+                const results = runMonteCarloSimulation(meanX, stdX, meanY, stdY, normalizedWeightA, normalizedWeightB, numSims);
+                results.weightA = weightA;
+                results.weightB = weightB;
+
+                updateUI(results);
+                updateDistributionChart(results.portfolioReturns);
+                updateCovarianceMatrix(results);
+                updateInterpretation(results, weightA, weightB);
+
+                lastSimulationResults = results;
+                showSuccess('Simulación completada correctamente');
+
+            } catch (error) {
+                console.error('Error en la simulación:', error);
+                showError(`Error al ejecutar la simulación: ${error.message}`);
+            } finally {
+                runButton.disabled = false;
+                runButton.innerHTML = originalButtonText;
+            }
+        }
+
+        // === UI UPDATE FUNCTIONS ===
+        function updateUI(results) {
+            const updateElement = (id, value, formatter = null) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = formatter ? formatter(value) : value;
+                }
+            };
+
+            updateElement('portfolioReturn', results.meanPortfolio, formatPercentage);
+            updateElement('portfolioRisk', results.stdPortfolio, formatPercentage);
+            updateElement('sharpeRatio', results.sharpeRatio, value => value.toFixed(3));
+            updateElement('var95', results.var95, formatPercentage);
+
+            updateMetricColor('portfolioReturn', results.meanPortfolio >= 0);
+            updateMetricColor('portfolioRisk', false);
+            updateMetricColor('sharpeRatio', results.sharpeRatio > 1);
+            updateMetricColor('var95', results.var95 >= 0);
+        }
+
+        function updateDistributionChart(portfolioReturns) {
+            try {
+                const chartCanvas = document.getElementById('distributionChart');
+                if (!chartCanvas) return;
+
+                if (distributionChart) {
+                    distributionChart.destroy();
+                    distributionChart = null;
+                }
+
+                const existingChart = Chart.getChart(chartCanvas);
+                if (existingChart) {
+                    existingChart.destroy();
+                }
+
+                const bins = 50;
+                const min = Math.min(...portfolioReturns);
+                const max = Math.max(...portfolioReturns);
+                const binSize = (max - min) / bins;
+
+                const histogram = new Array(bins).fill(0);
+                const labels = [];
+
+                for (let i = 0; i < bins; i++) {
+                    labels.push((min + i * binSize).toFixed(3));
+                }
+
+                portfolioReturns.forEach(value => {
+                    let binIndex = Math.min(Math.floor((value - min) / binSize), bins - 1);
+                    histogram[binIndex]++;
+                });
+
+                distributionChart = new Chart(chartCanvas.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Distribución de Retornos',
+                            data: histogram,
+                            backgroundColor: 'rgba(102, 126, 234, 0.7)',
+                            borderColor: 'rgba(102, 126, 234, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `Frecuencia: ${context.raw}`;
+                                    },
+                                    title: function(context) {
+                                        const minVal = parseFloat(context[0].label);
+                                        const maxVal = minVal + binSize;
+                                        return `Retorno: ${minVal.toFixed(3)} a ${maxVal.toFixed(3)}`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Retorno del Portfolio',
+                                    color: '#6b7280',
+                                    font: { weight: 'bold' }
+                                },
+                                grid: { display: false }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Frecuencia',
+                                    color: '#6b7280',
+                                    font: { weight: 'bold' }
+                                },
+                                beginAtZero: true,
+                                grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                            }
+                        }
+                    }
+                });
+
+            } catch (error) {
+                console.error('Error al actualizar el gráfico de distribución:', error);
+            }
+        }
+
+        function updateCovarianceMatrix(results) {
+            try {
+                const covXPortfolio = results.weightA * results.varX + results.weightB * results.covXY;
+                const covYPortfolio = results.weightA * results.covXY + results.weightB * results.varY;
+
+                const updateElement = (id, value) => {
+                    const element = document.getElementById(id);
+                    if (element) {
+                        element.textContent = value.toFixed(6);
+                    }
+                };
+
+                updateElement('varX', results.varX);
+                updateElement('covXY', results.covXY);
+                updateElement('covXPort', covXPortfolio);
+                updateElement('covYX', results.covXY);
+                updateElement('varY', results.varY);
+                updateElement('covYPort', covYPortfolio);
+                updateElement('covPortX', covXPortfolio);
+                updateElement('covPortY', covYPortfolio);
+                updateElement('varPort', results.varPortfolio);
+
+                updateElement('varXLabel', results.varX);
+                updateElement('varYLabel', results.varY);
+                updateElement('varPortLabel', results.varPortfolio);
+                updateElement('covXYLabel', results.covXY);
+
+            } catch (error) {
+                console.error('Error al actualizar la matriz de covarianza:', error);
+            }
+        }
+
+        function updateInterpretation(results, weightA, weightB) {
+            const interpretation = document.getElementById('interpretation');
+            const sharpeCategory = results.sharpeRatio > 1 ? 'alta' : results.sharpeRatio > 0.5 ? 'moderada' : 'baja';
+            const riskLevel = results.stdPortfolio > 0.3 ? 'alto' : results.stdPortfolio > 0.15 ? 'moderado' : 'bajo';
+
+            let analysis = `
+                <h4 class="text-lg font-semibold text-portfolio-primary mb-4">💡 Análisis del Portfolio</h4>
+                <div class="space-y-3">
+                    <p><strong>Composición:</strong> ${Math.round(weightA * 100)}% Activo X + ${Math.round(weightB * 100)}% Activo Y</p>
+                    <p><strong>Retorno Esperado:</strong> <span class="${results.meanPortfolio >= 0 ? 'text-finance-bull' : 'text-finance-bear'}">${formatPercentage(results.meanPortfolio)}</span> anual</p>
+                    <p><strong>Volatilidad (Riesgo):</strong> <span class="text-finance-bear">${formatPercentage(results.stdPortfolio)}</span> (${riskLevel})</p>
+                    <p><strong>Ratio de Sharpe:</strong> <span class="${results.sharpeRatio > 1 ? 'text-finance-bull' : 'text-finance-bear'}">${results.sharpeRatio.toFixed(3)}</span> (${sharpeCategory})</p>
+                    <p><strong>VaR 95%:</strong> En el peor 5% de los casos, las pérdidas podrían superar el <span class="text-finance-bear">${formatPercentage(Math.abs(results.var95))}</span></p>
+
+                    <div class="mt-4 p-3 bg-slate-100 dark:bg-slate-700 rounded-lg">
+                        <h5 class="font-semibold mb-2">🔍 Interpretación de la Matriz de Covarianza:</h5>
+                        <ul class="list-disc list-inside space-y-1 text-sm">
+                            <li>La varianza del portfolio (${results.varPortfolio.toFixed(6)}) es la suma ponderada de las varianzas y covarianzas de los activos.</li>
+                            <li>La covarianza entre X e Y es ${results.covXY >= 0 ? 'positiva' : 'negativa'}, lo que indica que los activos tienden a moverse ${results.covXY >= 0 ? 'en la misma dirección' : 'en direcciones opuestas'}.</li>
+                            <li>La diversificación es ${Math.abs(results.covXY) < 0.05 ? 'efectiva' : 'limitada'} debido a la ${Math.abs(results.covXY) < 0.05 ? 'baja' : 'alta'} correlación entre los activos.</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+
+            let recommendation = '';
+            if (results.sharpeRatio > 1.5) {
+                recommendation = 'Excelente relación riesgo-retorno. Considera aumentar la exposición a este portfolio.';
+            } else if (results.sharpeRatio > 1) {
+                recommendation = 'Buena relación riesgo-retorno. El portfolio es atractivo para inversores con perfil moderado.';
+            } else if (results.sharpeRatio > 0.5) {
+                recommendation = 'Relación riesgo-retorno aceptable. Considera ajustar los pesos para mejorar el rendimiento.';
+            } else {
+                recommendation = 'Baja relación riesgo-retorno. Se recomienda revisar la estrategia de inversión.';
+            }
+
+            analysis += `
+                <div class="mt-4 p-3 ${results.sharpeRatio > 1 ? 'bg-green-100 dark:bg-green-900' : 'bg-yellow-100 dark:bg-yellow-900'} rounded-lg">
+                    <h5 class="font-semibold mb-1">📌 Recomendación:</h5>
+                    <p class="text-sm">${recommendation}</p>
+                </div>
+            `;
+
+            interpretation.innerHTML = analysis;
+        }
+
+        // === UTILITY FUNCTIONS ===
+        function formatPercentage(value) {
+            return `${(value * 100).toFixed(2)}%`;
+        }
+
+        function updateMetricColor(elementId, isPositive) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+            
+            element.classList.remove('text-finance-bull', 'text-finance-bear');
+            
+            if (elementId === 'portfolioRisk' || elementId === 'var95') {
+                element.classList.add('text-finance-bear');
+            } else {
+                element.classList.add(isPositive ? 'text-finance-bull' : 'text-finance-bear');
+            }
+        }
+
+        function updateWeights() {
+            const weightA = document.getElementById('weightA');
+            const weightB = document.getElementById('weightB');
+            const weightAValue = document.getElementById('weightAValue');
+            const weightBValue = document.getElementById('weightBValue');
+            
+            if (!weightA || !weightB || !weightAValue || !weightBValue) return;
+
+            const valueA = parseFloat(weightA.value);
+            const valueB = parseFloat(weightB.value);
+
+            weightAValue.textContent = Math.round(valueA * 100) + '%';
+            weightBValue.textContent = Math.round(valueB * 100) + '%';
+
+            const financialPerspective = document.getElementById('financialPerspective')?.checked || false;
+            const financialInfo = document.getElementById('financialInfo');
+
+            if (financialPerspective && financialInfo) {
+                financialInfo.classList.remove('hidden');
+            } else if (financialInfo) {
+                financialInfo.classList.add('hidden');
+            }
+        }
+
+        // === EXPORT FUNCTIONS ===
+        function exportToPDF() {
+            try {
+                if (!window.jsPDF || !lastSimulationResults) {
+                    throw new Error('No hay datos de simulación para exportar');
+                }
+
+                const { jsPDF } = window.jsPDF;
+                const doc = new jsPDF();
+
+                doc.setFontSize(20);
+                doc.text('Portfolio Simulator - Reporte de Simulación', 20, 30);
+                
+                doc.setFontSize(12);
+                doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 20, 50);
+                
+                doc.text('Resultados de la Simulación:', 20, 70);
+                doc.text(`Retorno Esperado: ${formatPercentage(lastSimulationResults.meanPortfolio)}`, 30, 85);
+                doc.text(`Volatilidad: ${formatPercentage(lastSimulationResults.stdPortfolio)}`, 30, 100);
+                doc.text(`Ratio Sharpe: ${lastSimulationResults.sharpeRatio.toFixed(3)}`, 30, 115);
+                doc.text(`VaR 95%: ${formatPercentage(lastSimulationResults.var95)}`, 30, 130);
+
+                doc.save('portfolio-simulation-report.pdf');
+                showSuccess('Reporte PDF generado correctamente');
+            } catch (error) {
+                console.error('Error al generar PDF:', error);
+                showError('No se pudo generar el archivo PDF');
+            }
+        }
+
+        function exportToCSV() {
+            try {
+                if (!lastSimulationResults) {
+                    throw new Error('No hay datos de simulación para exportar');
+                }
+
+                const csvContent = [
+                    'Variable,Valor',
+                    `Retorno Esperado,${lastSimulationResults.meanPortfolio}`,
+                    `Volatilidad,${lastSimulationResults.stdPortfolio}`,
+                    `Ratio Sharpe,${lastSimulationResults.sharpeRatio}`,
+                    `VaR 95%,${lastSimulationResults.var95}`,
+                    `Varianza X,${lastSimulationResults.varX}`,
+                    `Varianza Y,${lastSimulationResults.varY}`,
+                    `Covarianza XY,${lastSimulationResults.covXY}`
+                ].join('\n');
+
+                const blob = new Blob([csvContent], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'portfolio-simulation-data.csv';
+                a.click();
+                window.URL.revokeObjectURL(url);
+                
+                showSuccess('Datos CSV exportados correctamente');
+            } catch (error) {
+                console.error('Error al exportar CSV:', error);
+                showError('No se pudo generar el archivo CSV');
+            }
+        }
+
+        function exportToJSON() {
+            try {
+                if (!lastSimulationResults) {
+                    throw new Error('No hay datos de simulación para exportar');
+                }
+
+                const jsonData = {
+                    timestamp: new Date().toISOString(),
+                    results: lastSimulationResults,
+                    parameters: {
+                        meanX: parseFloat(document.getElementById('meanX').value),
+                        stdX: parseFloat(document.getElementById('stdX').value),
+                        meanY: parseFloat(document.getElementById('meanY').value),
+                        stdY: parseFloat(document.getElementById('stdY').value),
+                        weightA: parseFloat(document.getElementById('weightA').value),
+                        weightB: parseFloat(document.getElementById('weightB').value),
+                        numSims: parseInt(document.getElementById('numSims').value)
+                    }
+                };
+
+                const blob = new Blob([JSON.stringify(jsonData, null, 2)], { type: 'application/json' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'portfolio-simulation-complete.json';
+                a.click();
+                window.URL.revokeObjectURL(url);
+                
+                showSuccess('Datos JSON exportados correctamente');
+            } catch (error) {
+                console.error('Error al exportar JSON:', error);
+                showError('No se pudo generar el archivo JSON');
+            }
+        }
+
+        // === EVENT LISTENERS SETUP ===
+        function setupEventListeners() {
+            console.log('Configurando event listeners...');
+
+            // Run simulation button
+            const runButton = document.getElementById('runSimulation');
+            if (runButton) {
+                runButton.addEventListener('click', runSimulation);
+            }
+
+            // Weight controls
+            const weightA = document.getElementById('weightA');
+            const weightB = document.getElementById('weightB');
+            if (weightA && weightB) {
+                weightA.addEventListener('input', updateWeights);
+                weightB.addEventListener('input', updateWeights);
+            }
+
+            // Financial perspective checkbox
+            const financialPerspective = document.getElementById('financialPerspective');
+            if (financialPerspective) {
+                financialPerspective.addEventListener('change', updateWeights);
+            }
+
+            // Matrix view toggle
+            const toggleMatrixView = document.getElementById('toggleMatrixView');
+            if (toggleMatrixView) {
+                toggleMatrixView.addEventListener('click', function() {
+                    const matrixView = document.getElementById('matrixView');
+                    const listView = document.getElementById('listView');
+                    
+                    if (matrixView && listView) {
+                        if (matrixView.classList.contains('hidden')) {
+                            matrixView.classList.remove('hidden');
+                            listView.classList.add('hidden');
+                            this.innerHTML = `
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                                </svg>
+                                Cambiar vista
+                            `;
+                        } else {
+                            matrixView.classList.add('hidden');
+                            listView.classList.remove('hidden');
+                            this.innerHTML = `
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                                </svg>
+                                Ver matriz
+                            `;
+                        }
+                    }
+                });
+            }
+
+            // Export functionality
+            const exportButton = document.getElementById('exportButton');
+            const exportMenu = document.getElementById('exportMenu');
+            if (exportButton && exportMenu) {
+                exportButton.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    exportMenu.classList.toggle('hidden');
+                });
+
+                // Close menu when clicking outside
+                document.addEventListener('click', function() {
+                    exportMenu.classList.add('hidden');
+                });
+
+                exportMenu.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+            }
+
+            // Export buttons
+            const exportPDF = document.getElementById('exportPDF');
+            const exportCSV = document.getElementById('exportCSV');
+            const exportJSON = document.getElementById('exportJSON');
+
+            if (exportPDF) {
+                exportPDF.addEventListener('click', () => {
+                    exportToPDF();
+                    exportMenu.classList.add('hidden');
+                });
+            }
+
+            if (exportCSV) {
+                exportCSV.addEventListener('click', () => {
+                    exportToCSV();
+                    exportMenu.classList.add('hidden');
+                });
+            }
+
+            if (exportJSON) {
+                exportJSON.addEventListener('click', () => {
+                    exportToJSON();
+                    exportMenu.classList.add('hidden');
+                });
+            }
+
+            // Advanced features toggle
+            const toggleAdvancedFeatures = document.getElementById('toggleAdvancedFeatures');
+            const advancedFeaturesPanel = document.getElementById('advancedFeaturesPanel');
+            if (toggleAdvancedFeatures && advancedFeaturesPanel) {
+                toggleAdvancedFeatures.addEventListener('click', function() {
+                    if (advancedFeaturesPanel.classList.contains('hidden')) {
+                        advancedFeaturesPanel.classList.remove('hidden');
+                        this.textContent = 'Ocultar';
+                    } else {
+                        advancedFeaturesPanel.classList.add('hidden');
+                        this.textContent = 'Mostrar';
+                    }
+                });
+            }
+
+            // Portfolio presets
+            const portfolioPreset = document.getElementById('portfolioPreset');
+            if (portfolioPreset) {
+                portfolioPreset.addEventListener('change', function() {
+                    const preset = this.value;
+                    const weightA = document.getElementById('weightA');
+                    const weightB = document.getElementById('weightB');
+                    
+                    if (!weightA || !weightB) return;
+
+                    switch(preset) {
+                        case 'conservador':
+                            weightA.value = 0.3;
+                            weightB.value = 0.7;
+                            break;
+                        case 'moderado':
+                            weightA.value = 0.6;
+                            weightB.value = 0.4;
+                            break;
+                        case 'agresivo':
+                            weightA.value = 0.8;
+                            weightB.value = 0.2;
+                            break;
+                        case 'apalancado':
+                            weightA.value = 0.7;
+                            weightB.value = 0.5;
+                            break;
+                        case 'cobertura':
+                            weightA.value = 0.9;
+                            weightB.value = -0.1;
+                            break;
+                    }
+                    
+                    if (preset) {
+                        updateWeights();
+                        showSuccess(`Preset "${preset}" aplicado correctamente`);
+                    }
+                });
+            }
+
+            // Save configuration
+            const saveConfig = document.getElementById('saveConfig');
+            const configName = document.getElementById('configName');
+            if (saveConfig && configName) {
+                saveConfig.addEventListener('click', function() {
+                    const name = configName.value.trim();
+                    if (!name) {
+                        showError('Por favor ingresa un nombre para la configuración');
+                        return;
+                    }
+
+                    try {
+                        const config = {
+                            name: name,
+                            timestamp: new Date().toISOString(),
+                            parameters: {
+                                meanX: parseFloat(document.getElementById('meanX').value),
+                                stdX: parseFloat(document.getElementById('stdX').value),
+                                meanY: parseFloat(document.getElementById('meanY').value),
+                                stdY: parseFloat(document.getElementById('stdY').value),
+                                weightA: parseFloat(document.getElementById('weightA').value),
+                                weightB: parseFloat(document.getElementById('weightB').value),
+                                numSims: parseInt(document.getElementById('numSims').value)
+                            }
+                        };
+
+                        let savedConfigs = [];
+                        try {
+                            savedConfigs = JSON.parse(localStorage.getItem('portfolioConfigs') || '[]');
+                        } catch (e) {
+                            console.warn('Error al cargar configuraciones guardadas:', e);
+                        }
+
+                        savedConfigs.push(config);
+                        localStorage.setItem('portfolioConfigs', JSON.stringify(savedConfigs));
+                        
+                        configName.value = '';
+                        showSuccess(`Configuración "${name}" guardada correctamente`);
+                    } catch (error) {
+                        console.error('Error al guardar configuración:', error);
+                        showError('No se pudo guardar la configuración');
+                    }
+                });
+            }
+
+            // History and comparison buttons
+            const showHistory = document.getElementById('showHistory');
+            const compareScenarios = document.getElementById('compareScenarios');
+
+            if (showHistory) {
+                showHistory.addEventListener('click', function() {
+                    try {
+                        const savedConfigs = JSON.parse(localStorage.getItem('portfolioConfigs') || '[]');
+                        if (savedConfigs.length === 0) {
+                            showError('No hay configuraciones guardadas');
+                            return;
+                        }
+
+                        let historyText = 'Configuraciones guardadas:\n\n';
+                        savedConfigs.forEach((config, index) => {
+                            historyText += `${index + 1}. ${config.name} (${new Date(config.timestamp).toLocaleDateString()})\n`;
+                        });
+
+                        alert(historyText);
+                    } catch (error) {
+                        console.error('Error al mostrar historial:', error);
+                        showError('No se pudo cargar el historial');
+                    }
+                });
+            }
+
+            if (compareScenarios) {
+                compareScenarios.addEventListener('click', function() {
+                    showSuccess('Función de comparación en desarrollo');
+                });
+            }
+
+            console.log('Event listeners configurados correctamente');
+        }
+
+        // === INITIALIZATION ===
+        function initializeApp() {
+            console.log('Inicializando aplicación...');
+            
+            // Wait for all CDNs to load
+            const checkDependencies = () => {
+                return new Promise((resolve) => {
+                    const checkInterval = setInterval(() => {
+                        if (typeof Chart !== 'undefined' && typeof tailwind !== 'undefined') {
+                            clearInterval(checkInterval);
+                            resolve();
+                        }
+                    }, 100);
+                    
+                    // Timeout after 10 seconds
+                    setTimeout(() => {
+                        clearInterval(checkInterval);
+                        resolve();
+                    }, 10000);
+                });
+            };
+            
+            checkDependencies().then(() => {
+                try {
+                    console.log('Dependencias verificadas:', {
+                        'Chart.js': typeof Chart !== 'undefined',
+                        'Tailwind': typeof tailwind !== 'undefined',
+                        'jsPDF': typeof window.jsPDF !== 'undefined'
+                    });
+                    
+                    // Initialize dark mode
+                    initializeDarkMode();
+                    
+                    // Setup all event listeners
+                    setupEventListeners();
+                    
+                    // Initialize weight displays
+                    updateWeights();
+                    
+                    // Initialize empty chart
+                    const chartCanvas = document.getElementById('distributionChart');
+                    if (chartCanvas && typeof Chart !== 'undefined') {
+                        distributionChart = new Chart(chartCanvas.getContext('2d'), {
+                            type: 'bar',
+                            data: {
+                                labels: ['Ejecuta una simulación para ver los datos'],
+                                datasets: [{
+                                    label: 'Distribución de Retornos',
+                                    data: [0],
+                                    backgroundColor: 'rgba(102, 126, 234, 0.7)',
+                                    borderColor: 'rgba(102, 126, 234, 1)',
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: { display: false },
+                                    tooltip: {
+                                        callbacks: {
+                                            title: function() {
+                                                return 'Ejecuta una simulación para ver los datos';
+                                            }
+                                        }
+                                    }
+                                },
+                                scales: {
+                                    x: {
+                                        title: {
+                                            display: true,
+                                            text: 'Retorno del Portfolio',
+                                            color: '#6b7280',
+                                            font: { weight: 'bold' }
+                                        },
+                                        grid: { display: false }
+                                    },
+                                    y: {
+                                        title: {
+                                            display: true,
+                                            text: 'Frecuencia',
+                                            color: '#6b7280',
+                                            font: { weight: 'bold' }
+                                        },
+                                        beginAtZero: true,
+                                        grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                                    }
+                                }
+                            }
+                        });
+                        console.log('✅ Gráfico inicializado correctamente');
+                    } else {
+                        console.error('❌ No se pudo inicializar el gráfico - Chart.js no disponible');
+                        showError('Chart.js no se cargó correctamente. Recarga la página.');
+                    }
+                    
+                    showSuccess('Aplicación inicializada correctamente', 2000);
+                    console.log('✅ Portfolio Simulator inicializado correctamente');
+                    
+                } catch (error) {
+                    console.error('Error al inicializar la aplicación:', error);
+                    showError('Error al inicializar la aplicación. Por favor, recarga la página.');
+                }
+            });
+        }
+
+        // Initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeApp);
+        } else {
+            initializeApp();
+        }
+
+        // Make functions globally available for debugging
+        window.runSimulation = runSimulation;
+        window.exportToPDF = exportToPDF;
+        window.exportToCSV = exportToCSV;
+        window.exportToJSON = exportToJSON;
+        
+        console.log('🎯 Portfolio Simulator completamente cargado y listo para usar');
+    </script>
 </body>
 </html>
