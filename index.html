@@ -5,7 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simulador de Portfolio - Variables Aleatorias</title>
     <link href="./src/styles/main.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.0/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Bibliotecas externas -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://unpkg.com/jspdf-autotable@3.5.28/dist/jspdf.plugin.autotable.js"></script>
 </head>
 <body class="antialiased">
     <div id="app">
@@ -17,7 +22,7 @@
         <header class="sticky top-0 z-40 glass-effect">
             <nav class="container mx-auto px-6 py-4">
                 <div class="flex items-center justify-between">
-                    <h1 class="text-2xl font-bold gradient-text">📊 Portfolio Simulator</h1>
+                    <h1 class="text-2xl font-bold gradient-text">🔊 Portfolio Simulator</h1>
                     <button id="darkModeToggle" class="p-2 rounded-lg hover:bg-white/20 transition-colors">
                         <span class="dark:hidden">🌙</span>
                         <span class="hidden dark:inline">☀️</span>
@@ -26,384 +31,268 @@
             </nav>
         </header>
 
-        <!-- Hero Section -->
-        <section class="relative overflow-hidden py-12 md:py-20">
-            <div class="container mx-auto px-6 text-center">
-                <h2 class="text-4xl md:text-6xl font-bold gradient-text mb-6 animate-fade-in">
-                    Variables Aleatorias
-                </h2>
-                <p class="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto animate-slide-up">
-                    Aplicación práctica en análisis de portfolios financieros
-                </p>
-            </div>
-        </section>
-
-        <!-- Main Application -->
-        <main class="container mx-auto px-4 md:px-6 py-8 md:py-12">
-            <div class="grid lg:grid-cols-12 gap-6">
-                <!-- Control Panel -->
-                <aside class="lg:col-span-4 space-y-6">
-                    <!-- Assets Card -->
-                    <div class="card p-6">
-                        <h3 class="text-xl font-semibold mb-6 flex items-center">
-                            📊 <span class="ml-2">Activos Financieros</span>
-                        </h3>
-                        
-                        <!-- Asset X -->
-                        <div class="space-y-4 mb-6">
-                            <h4 class="font-medium text-portfolio-primary">Activo X</h4>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label for="meanX" class="block text-sm font-medium mb-2">Media (μ)</label>
-                                    <input type="number" id="meanX" class="input" step="0.01" value="0.08">
-                                </div>
-                                <div>
-                                    <label for="stdX" class="block text-sm font-medium mb-2">Volatilidad (σ)</label>
-                                    <input type="number" id="stdX" class="input" step="0.01" value="0.2">
-                                </div>
+        <main class="container mx-auto px-6 py-8">
+            <div class="max-w-4xl mx-auto">
+                <!-- Hero Section -->
+                <section class="mb-12">
+                    <h2 class="text-3xl font-bold mb-4">Simulador de Portfolio de Inversiones</h2>
+                    <p class="text-gray-600 dark:text-gray-300 mb-6">Explora cómo diferentes combinaciones de activos afectan el rendimiento y riesgo de tu portfolio utilizando simulación Monte Carlo.</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- Imagen ilustrativa -->
+                        <div class="rounded-xl overflow-hidden bg-gradient-to-br from-portfolio-primary/20 to-portfolio-secondary/20 p-6 flex items-center justify-center">
+                            <div class="text-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 mx-auto mb-4 text-portfolio-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                                    <path d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" />
+                                    <path d="M12 7L12 13L16 13" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                                <h3 class="text-xl font-semibold mb-2">Simulación Monte Carlo</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-300">Genera miles de escenarios aleatorios para estimar el comportamiento del portfolio.</p>
                             </div>
                         </div>
                         
-                        <!-- Asset Y -->
+                        <!-- Características -->
                         <div class="space-y-4">
-                            <h4 class="font-medium text-portfolio-secondary">Activo Y</h4>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label for="meanY" class="block text-sm font-medium mb-2">Media (μ)</label>
-                                    <input type="number" id="meanY" class="input" step="0.01" value="0.06">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 h-6 w-6 text-portfolio-primary">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
                                 </div>
-                                <div>
-                                    <label for="stdY" class="block text-sm font-medium mb-2">Volatilidad (σ)</label>
-                                    <input type="number" id="stdY" class="input" step="0.01" value="0.15">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Portfolio Weights -->
-                    <div class="card p-6">
-                        <h3 class="text-xl font-semibold mb-6 flex items-center">
-                            ⚖️ <span class="ml-2">Pesos del Portfolio</span>
-                        </h3>
-                        
-                        <div class="space-y-4">
-                            <div class="flex items-center mb-4">
-                                <input type="checkbox" id="financialPerspective" class="rounded text-portfolio-primary focus:ring-portfolio-primary">
-                                <label for="financialPerspective" class="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    💰 Activar Perspectiva Financiera
-                                </label>
-                            </div>
-                            
-                            <div id="financialInfo" class="hidden bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 p-4 mb-4 text-sm">
-                                <h4 class="font-bold mb-2">Interpretación Financiera:</h4>
-                                <ul class="space-y-1">
-                                    <li>• <strong>Suma = 100%</strong>: Portfolio tradicional (ej: 60% acciones + 40% bonos)</li>
-                                    <li>• <strong>Suma &lt; 100%</strong>: Portfolio + efectivo (ej: 70% inversiones + 30% cash)</li>
-                                    <li>• <strong>Suma &gt; 100%</strong>: Portfolio apalancado (ej: 120% inversiones)</li>
-                                    <li>• <strong>Pesos negativos</strong>: Posiciones cortas (ej: 150% largo - 50% corto)</li>
-                                </ul>
-                            </div>
-                            
-                            <div>
-                                <label for="weightA" class="block text-sm font-medium mb-2">Peso A (Activo X)</label>
-                                <input type="range" id="weightA" min="0" max="1" step="0.1" value="0.6" 
-                                       class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider">
-                                <div class="flex justify-between text-sm text-gray-500 mt-1">
-                                    <span>0%</span>
-                                    <span id="weightAValue" class="font-medium">60%</span>
-                                    <span>100%</span>
+                                <div class="ml-3">
+                                    <h3 class="text-lg font-medium">Análisis de Riesgo-Retorno</h3>
+                                    <p class="text-gray-600 dark:text-gray-300 text-sm">Calcula métricas clave como retorno esperado, volatilidad y ratio de Sharpe.</p>
                                 </div>
                             </div>
-                            
-                            <div>
-                                <label for="weightB" class="block text-sm font-medium mb-2">Peso B (Activo Y)</label>
-                                <input type="range" id="weightB" min="0" max="1" step="0.1" value="0.4" 
-                                       class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider">
-                                <div class="flex justify-between text-sm text-gray-500 mt-1">
-                                    <span>0%</span>
-                                    <span id="weightBValue" class="font-medium">40%</span>
-                                    <span>100%</span>
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 h-6 w-6 text-portfolio-primary">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-lg font-medium">Visualización de Distribuciones</h3>
+                                    <p class="text-gray-600 dark:text-gray-300 text-sm">Observa la distribución de los posibles retornos de tu portfolio.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 h-6 w-6 text-portfolio-primary">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-lg font-medium">Optimización de Pesos</h3>
+                                    <p class="text-gray-600 dark:text-gray-300 text-sm">Ajusta los pesos de los activos para encontrar la combinación óptima.</p>
                                 </div>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Simulation Controls -->
-                    <div class="card p-6">
-                        <h3 class="text-xl font-semibold mb-6">🎛️ Simulación</h3>
-                        <div class="space-y-4">
-                            <div>
-                                <label for="numSims" class="block text-sm font-medium mb-2">Número de simulaciones</label>
-                                <select id="numSims" class="input">
-                                    <option value="1000">1,000</option>
-                                    <option value="10000" selected>10,000</option>
-                                    <option value="50000">50,000</option>
-                                    <option value="100000">100,000</option>
-                                </select>
+                </section>
+                
+                <!-- Simulation Section -->
+                <section class="mb-12">
+                    <h3 class="text-2xl font-bold mb-6">Configuración de la Simulación</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- Inputs -->
+                        <div class="card p-6">
+                            <h4 class="text-lg font-semibold mb-4">Parámetros de los Activos</h4>
+                            
+                            <!-- Asset X -->
+                            <div class="mb-6">
+                                <h5 class="font-medium mb-3 text-portfolio-primary">Activo X</h5>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="meanX" class="block text-sm font-medium mb-1">Retorno Esperado</label>
+                                        <input type="number" id="meanX" step="0.01" value="0.08" class="w-full rounded-lg border-gray-300 dark:border-gray-700 dark:bg-gray-800 focus:ring-portfolio-primary focus:border-portfolio-primary">
+                                    </div>
+                                    <div>
+                                        <label for="stdX" class="block text-sm font-medium mb-1">Volatilidad</label>
+                                        <input type="number" id="stdX" step="0.01" value="0.20" class="w-full rounded-lg border-gray-300 dark:border-gray-700 dark:bg-gray-800 focus:ring-portfolio-primary focus:border-portfolio-primary">
+                                    </div>
+                                </div>
                             </div>
                             
-                            <button id="runSimulation" class="btn btn-primary w-full">
+                            <!-- Asset Y -->
+                            <div class="mb-6">
+                                <h5 class="font-medium mb-3 text-portfolio-primary">Activo Y</h5>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="meanY" class="block text-sm font-medium mb-1">Retorno Esperado</label>
+                                        <input type="number" id="meanY" step="0.01" value="0.12" class="w-full rounded-lg border-gray-300 dark:border-gray-700 dark:bg-gray-800 focus:ring-portfolio-primary focus:border-portfolio-primary">
+                                    </div>
+                                    <div>
+                                        <label for="stdY" class="block text-sm font-medium mb-1">Volatilidad</label>
+                                        <input type="number" id="stdY" step="0.01" value="0.30" class="w-full rounded-lg border-gray-300 dark:border-gray-700 dark:bg-gray-800 focus:ring-portfolio-primary focus:border-portfolio-primary">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Portfolio Weights -->
+                            <div class="mb-6">
+                                <h5 class="font-medium mb-3 text-portfolio-primary">Pesos del Portfolio</h5>
+                                
+                                <div class="mb-4">
+                                    <div class="flex justify-between mb-1">
+                                        <label for="weightA" class="block text-sm font-medium">Peso Activo X</label>
+                                        <span id="weightAValue" class="text-sm font-medium">60%</span>
+                                    </div>
+                                    <input type="range" id="weightA" min="0" max="1" step="0.01" value="0.6" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
+                                </div>
+                                
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <label for="weightB" class="block text-sm font-medium">Peso Activo Y</label>
+                                        <span id="weightBValue" class="text-sm font-medium">40%</span>
+                                    </div>
+                                    <input type="range" id="weightB" min="0" max="1" step="0.01" value="0.4" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
+                                </div>
+                            </div>
+                            
+                            <!-- Simulation Parameters -->
+                            <div class="mb-6">
+                                <h5 class="font-medium mb-3 text-portfolio-primary">Parámetros de Simulación</h5>
+                                <div>
+                                    <label for="numSims" class="block text-sm font-medium mb-1">Número de Simulaciones</label>
+                                    <input type="number" id="numSims" min="100" max="100000" step="100" value="10000" class="w-full rounded-lg border-gray-300 dark:border-gray-700 dark:bg-gray-800 focus:ring-portfolio-primary focus:border-portfolio-primary">
+                                </div>
+                            </div>
+                            
+                            <button id="runSimulation" class="w-full py-3 px-4 bg-portfolio-primary text-white font-medium rounded-lg hover:bg-portfolio-primary/90 transition-colors">
                                 🚀 Ejecutar Simulación
                             </button>
+                        </div>
+                        
+                        <!-- Results -->
+                        <div class="card p-6">
+                            <h4 class="text-lg font-semibold mb-4">Resultados</h4>
                             
-                            <!-- Características Avanzadas -->
-                            <div class="mt-4">
-                                <div class="flex justify-between items-center mb-2">
-                                    <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300">⚙️ Características Avanzadas</h4>
-                                    <button id="toggleAdvancedFeatures" class="text-xs text-portfolio-primary hover:text-portfolio-primary-dark">
-                                        Mostrar
+                            <!-- Key Metrics -->
+                            <div class="grid grid-cols-2 gap-4 mb-6">
+                                <div class="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+                                    <h5 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Retorno Esperado</h5>
+                                    <p id="portfolioReturn" class="text-2xl font-bold text-finance-bull">-</p>
+                                </div>
+                                <div class="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+                                    <h5 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Volatilidad</h5>
+                                    <p id="portfolioRisk" class="text-2xl font-bold text-finance-bear">-</p>
+                                </div>
+                                <div class="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+                                    <h5 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Ratio de Sharpe</h5>
+                                    <p id="sharpeRatio" class="text-2xl font-bold">-</p>
+                                </div>
+                                <div class="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+                                    <h5 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">VaR (95%)</h5>
+                                    <p id="var95" class="text-2xl font-bold">-</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Distribution Chart -->
+                            <div class="mb-6">
+                                <h5 class="font-medium mb-3">Distribución de Retornos</h5>
+                                <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm" style="height: 200px;">
+                                    <canvas id="distributionChart"></canvas>
+                                </div>
+                            </div>
+                            
+                            <!-- Covariance Matrix -->
+                            <div>
+                                <div class="flex justify-between items-center mb-3">
+                                    <h5 class="font-medium">Matriz de Covarianza</h5>
+                                    <button id="toggleMatrixView" class="text-xs text-portfolio-primary hover:underline">
+                                        Ver matriz
                                     </button>
                                 </div>
                                 
-                                <div id="advancedFeaturesPanel" class="hidden space-y-4 mt-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                                    <!-- Presets de Portfolio -->
-                                    <div>
-                                        <label for="portfolioPreset" class="block text-xs font-medium mb-1">Presets de Portfolio</label>
-                                        <select id="portfolioPreset" class="input text-sm py-1">
-                                            <option value="">-- Seleccionar preset --</option>
-                                            <option value="conservador">Conservador</option>
-                                            <option value="moderado">Moderado</option>
-                                            <option value="agresivo">Agresivo</option>
-                                            <option value="apalancado">Apalancado</option>
-                                            <option value="cobertura">Cobertura</option>
-                                        </select>
+                                <!-- List View (default) -->
+                                <div id="matrixListView" class="space-y-2 text-sm">
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600 dark:text-gray-400">Var(X):</span>
+                                        <span id="varXLabel" class="font-mono">-</span>
                                     </div>
-                                    
-                                    <!-- Guardar Configuración -->
-                                    <div class="flex space-x-2">
-                                        <input type="text" id="configName" placeholder="Nombre de la configuración" class="input text-sm py-1 flex-grow">
-                                        <button id="saveConfig" class="btn btn-sm btn-secondary py-1 px-2 text-xs">
-                                            💾 Guardar
-                                        </button>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600 dark:text-gray-400">Var(Y):</span>
+                                        <span id="varYLabel" class="font-mono">-</span>
                                     </div>
-                                    
-                                    <!-- Historial -->
-                                    <div>
-                                        <button id="showHistory" class="btn btn-sm btn-outline w-full text-xs py-1">
-                                            📜 Historial de Simulaciones
-                                        </button>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600 dark:text-gray-400">Var(Portfolio):</span>
+                                        <span id="varPortLabel" class="font-mono">-</span>
                                     </div>
-                                    
-                                    <!-- Comparación -->
-                                    <div>
-                                        <button id="compareScenarios" class="btn btn-sm btn-outline w-full text-xs py-1">
-                                            🔄 Comparar Escenarios
-                                        </button>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600 dark:text-gray-400">Cov(X,Y):</span>
+                                        <span id="covXYLabel" class="font-mono">-</span>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </aside>
-
-                <!-- Results Panel -->
-                <section class="lg:col-span-8 space-y-6">
-                    <!-- Key Metrics -->
-                    <div class="grid md:grid-cols-2 xl:grid-cols-4 gap-4">
-                        <div class="metric-card">
-                            <div class="text-sm text-gray-500 mb-2">Retorno Esperado</div>
-                            <div id="portfolioReturn" class="text-2xl font-bold text-finance-bull">-</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="text-sm text-gray-500 mb-2">Riesgo (σ)</div>
-                            <div id="portfolioRisk" class="text-2xl font-bold text-finance-bear">-</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="text-sm text-gray-500 mb-2">Ratio Sharpe</div>
-                            <div id="sharpeRatio" class="text-2xl font-bold text-portfolio-primary">-</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="text-sm text-gray-500 mb-2">VaR 95%</div>
-                            <div id="var95" class="text-2xl font-bold text-finance-bear">-</div>
-                        </div>
-                    </div>
-
-                    <!-- Distribution Chart -->
-                    <div class="card p-6">
-                        <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-xl font-semibold">📈 Distribución de Retornos</h3>
-                            
-                            <!-- Botones de exportación -->
-                            <div class="flex space-x-2">
-                                <div class="relative inline-block">
-                                    <button id="exportButton" class="btn btn-sm btn-outline flex items-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                        </svg>
-                                        Exportar
-                                    </button>
-                                    <div id="exportMenu" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg z-10">
-                                        <div class="py-1">
-                                            <button id="exportPDF" class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                                                </svg>
-                                                Exportar a PDF
-                                            </button>
-                                            <button id="exportCSV" class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                                </svg>
-                                                Exportar a CSV
-                                            </button>
-                                            <button id="exportJSON" class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                </svg>
-                                                Exportar a JSON
-                                            </button>
-                                        </div>
-                                        <div class="border-t border-gray-200 dark:border-gray-700"></div>
-                                        <div class="py-1">
-                                            <button id="shareTwitter" class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-blue-400" viewBox="0 0 24 24" fill="currentColor">
-                                                    <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723 10.1 10.1 0 01-3.127 1.184 4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
-                                                </svg>
-                                                Compartir en Twitter
-                                            </button>
-                                            <button id="shareLinkedIn" class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-blue-600" viewBox="0 0 24 24" fill="currentColor">
-                                                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                                                </svg>
-                                                Compartir en LinkedIn
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="relative h-80 md:h-96">
-                            <canvas id="distributionChart"></canvas>
-                        </div>
-                    </div>
-
-                    <!-- Covariance Matrix -->
-                    <div class="card p-6">
-                        <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-xl font-semibold">🔢 Matriz de Covarianza</h3>
-                            <button id="toggleMatrixView" class="text-sm text-portfolio-primary hover:text-portfolio-primary-dark flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                                </svg>
-                                Cambiar vista
-                            </button>
-                        </div>
-                        
-                        <!-- Contenedor para mensajes de error -->
-                        <div id="errorContainer" class="mb-4"></div>
-                        
-                        <!-- Vista de matriz -->
-                        <div id="matrixView" class="overflow-x-auto">
-                            <table class="min-w-full bg-white dark:bg-gray-800 rounded-lg overflow-hidden">
-                                <thead>
-                                    <tr>
-                                        <th class="px-4 py-3 bg-gray-50 dark:bg-gray-700 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Activo</th>
-                                        <th class="px-4 py-3 bg-gray-50 dark:bg-gray-700 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">X</th>
-                                        <th class="px-4 py-3 bg-gray-50 dark:bg-gray-700 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Y</th>
-                                        <th class="px-4 py-3 bg-gray-50 dark:bg-gray-700 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Portfolio</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                                    <tr>
-                                        <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">X</td>
-                                        <td id="varX" class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 font-mono bg-blue-50 dark:bg-blue-900/30 font-bold">0.0000</td>
-                                        <td id="covXY" class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 font-mono">0.0000</td>
-                                        <td id="covXPort" class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 font-mono">0.0000</td>
-                                    </tr>
-                                    <tr class="bg-gray-50 dark:bg-gray-800">
-                                        <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">Y</td>
-                                        <td id="covYX" class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 font-mono">0.0000</td>
-                                        <td id="varY" class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 font-mono bg-blue-50 dark:bg-blue-900/30 font-bold">0.0000</td>
-                                        <td id="covYPort" class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 font-mono">0.0000</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">Portfolio</td>
-                                        <td id="covPortX" class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 font-mono">0.0000</td>
-                                        <td id="covPortY" class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 font-mono">0.0000</td>
-                                        <td id="varPort" class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 font-mono bg-blue-50 dark:bg-blue-900/30 font-bold">0.0000</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            
-                            <!-- Leyenda -->
-                            <div class="mt-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-                                <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Leyenda:</h4>
-                                <ul class="text-xs text-gray-600 dark:text-gray-400 space-y-1">
-                                    <li class="flex items-start">
-                                        <span class="inline-block w-3 h-3 bg-blue-100 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-700 rounded-sm mr-2 mt-0.5"></span>
-                                        <span><span class="font-mono">Var(X)</span>: Varianza (dispersión de los retornos de un activo)</span>
-                                    </li>
-                                    <li class="flex items-start">
-                                        <span class="inline-block w-3 h-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-sm mr-2 mt-0.5"></span>
-                                        <span><span class="font-mono">Cov(X,Y)</span>: Covarianza (relación lineal entre dos activos)</span>
-                                    </li>
-                                    <li class="flex items-start">
-                                        <span class="inline-block w-3 h-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-sm mr-2 mt-0.5"></span>
-                                        <span><span class="font-mono">Cov(X,Port)</span>: Covarianza entre un activo y el portfolio</span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        
-                        <!-- Vista de lista (inicialmente oculta) -->
-                        <div id="listView" class="hidden">
-                            <div class="space-y-3">
-                                <div class="p-3 bg-white dark:bg-gray-800 rounded-lg shadow">
-                                    <h4 class="font-medium text-gray-900 dark:text-white">Varianza del Activo X</h4>
-                                    <p id="varXLabel" class="text-2xl font-mono text-blue-600 dark:text-blue-400">0.0000</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Mide la dispersión de los retornos del Activo X</p>
                                 </div>
                                 
-                                <div class="p-3 bg-white dark:bg-gray-800 rounded-lg shadow">
-                                    <h4 class="font-medium text-gray-900 dark:text-white">Varianza del Activo Y</h4>
-                                    <p id="varYLabel" class="text-2xl font-mono text-blue-600 dark:text-blue-400">0.0000</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Mide la dispersión de los retornos del Activo Y</p>
+                                <!-- Matrix View (hidden by default) -->
+                                <div id="matrixGridView" class="hidden">
+                                    <div class="overflow-x-auto">
+                                        <table class="min-w-full text-xs">
+                                            <thead>
+                                                <tr>
+                                                    <th class="p-2 border border-gray-300 dark:border-gray-700"></th>
+                                                    <th class="p-2 border border-gray-300 dark:border-gray-700">X</th>
+                                                    <th class="p-2 border border-gray-300 dark:border-gray-700">Y</th>
+                                                    <th class="p-2 border border-gray-300 dark:border-gray-700">Portfolio</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <th class="p-2 border border-gray-300 dark:border-gray-700">X</th>
+                                                    <td id="varX" class="p-2 border border-gray-300 dark:border-gray-700 font-mono">-</td>
+                                                    <td id="covXY" class="p-2 border border-gray-300 dark:border-gray-700 font-mono">-</td>
+                                                    <td id="covXPort" class="p-2 border border-gray-300 dark:border-gray-700 font-mono">-</td>
+                                                </tr>
+                                                <tr>
+                                                    <th class="p-2 border border-gray-300 dark:border-gray-700">Y</th>
+                                                    <td id="covYX" class="p-2 border border-gray-300 dark:border-gray-700 font-mono">-</td>
+                                                    <td id="varY" class="p-2 border border-gray-300 dark:border-gray-700 font-mono">-</td>
+                                                    <td id="covYPort" class="p-2 border border-gray-300 dark:border-gray-700 font-mono">-</td>
+                                                </tr>
+                                                <tr>
+                                                    <th class="p-2 border border-gray-300 dark:border-gray-700">Portfolio</th>
+                                                    <td id="covPortX" class="p-2 border border-gray-300 dark:border-gray-700 font-mono">-</td>
+                                                    <td id="covPortY" class="p-2 border border-gray-300 dark:border-gray-700 font-mono">-</td>
+                                                    <td id="varPort" class="p-2 border border-gray-300 dark:border-gray-700 font-mono">-</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                                 
-                                <div class="p-3 bg-white dark:bg-gray-800 rounded-lg shadow">
-                                    <h4 class="font-medium text-gray-900 dark:text-white">Varianza del Portfolio</h4>
-                                    <p id="varPortLabel" class="text-2xl font-mono text-blue-600 dark:text-blue-400">0.0000</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Mide el riesgo total del portfolio</p>
-                                </div>
-                                
-                                <div class="p-3 bg-white dark:bg-gray-800 rounded-lg shadow">
-                                    <h4 class="font-medium text-gray-900 dark:text-white">Covarianza entre X e Y</h4>
-                                    <p id="covXYLabel" class="text-2xl font-mono text-gray-700 dark:text-gray-300">0.0000</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Mide cómo se mueven juntos los activos X e Y</p>
-                                </div>
+                                <script>
+                                    document.getElementById('toggleMatrixView').addEventListener('click', function() {
+                                        const listView = document.getElementById('matrixListView');
+                                        const gridView = document.getElementById('matrixGridView');
+                                        const isListVisible = !listView.classList.contains('hidden');
+                                        
+                                        if (isListVisible) {
+                                            listView.classList.add('hidden');
+                                            gridView.classList.remove('hidden');
+                                            this.innerHTML = `
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                                                </svg>
+                                                Ver lista
+                                            `;
+                                        } else {
+                                            listView.classList.remove('hidden');
+                                            gridView.classList.add('hidden');
+                                            this.innerHTML = `
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                                                </svg>
+                                                Ver matriz
+                                            `;
+                                        }
+                                    });
+                                </script>
+
                             </div>
                         </div>
                     </div>
                     
-                    <script>
-                        // Toggle entre vistas de matriz y lista
-                        document.getElementById('toggleMatrixView').addEventListener('click', function() {
-                            const matrixView = document.getElementById('matrixView');
-                            const listView = document.getElementById('listView');
-                            const button = document.getElementById('toggleMatrixView');
-                            
-                            if (matrixView.classList.contains('hidden')) {
-                                matrixView.classList.remove('hidden');
-                                listView.classList.add('hidden');
-                                button.innerHTML = `
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                                    </svg>
-                                    Cambiar vista
-                                `;
-                            } else {
-                                matrixView.classList.add('hidden');
-                                listView.classList.remove('hidden');
-                                button.innerHTML = `
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                                    </svg>
-                                    Ver matriz
-                                `;
-                            }
-                        });
-                    </script>
-
                     <!-- Interpretation -->
                     <div id="interpretation" class="card p-6 border-l-4 border-portfolio-primary">
                         <h4 class="text-lg font-semibold text-portfolio-primary mb-4">💡 Análisis del Portfolio</h4>
@@ -415,6 +304,6 @@
     </div>
 
     <!-- Scripts -->
-    <script type="module" src="/src/scripts/main.js"></script>
+    <script src="./standalone.js"></script>
 </body>
 </html>
