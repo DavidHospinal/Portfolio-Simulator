@@ -1,0 +1,245 @@
+// Función para mostrar carga en el botón
+function setButtonLoading(button, isLoading) {
+    if (!button) return;
+    
+    try {
+        // Solo actualizar si el estado está cambiando
+        if ((isLoading && button.disabled) || (!isLoading && !button.disabled)) {
+            return;
+        }
+        
+        if (isLoading) {
+            // Guardar el contenido original solo si no está ya en estado de carga
+            if (!button.dataset.originalContent) {
+                button.dataset.originalContent = button.innerHTML;
+            }
+            button.disabled = true;
+            button.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Procesando...
+            `;
+        } else {
+            button.disabled = false;
+            const originalContent = button.dataset.originalContent || 'Ejecutar Simulación';
+            button.innerHTML = originalContent;
+            delete button.dataset.originalContent;
+        }
+    } catch (error) {
+        console.error('Error en setButtonLoading:', error);
+        // Asegurarse de que el botón no quede deshabilitado
+        if (button) {
+            button.disabled = false;
+            button.innerHTML = 'Ejecutar Simulación';
+        }
+    }
+}
+
+// Función para mostrar errores en la interfaz
+function showError(message) {
+    console.error('Error:', message);
+    const errorElement = document.getElementById('error-message');
+    if (errorElement) {
+        errorElement.textContent = message;
+        errorElement.classList.remove('hidden');
+        
+        // Ocultar el mensaje después de 5 segundos
+        setTimeout(() => {
+            errorElement.classList.add('hidden');
+        }, 5000);
+    }
+}
+
+// Función para actualizar los pesos
+function updateWeights() {
+    try {
+        const weightAElement = document.getElementById('weightA');
+        const weightBElement = document.getElementById('weightB');
+        const weightAValueElement = document.getElementById('weightAValue');
+        const weightBValueElement = document.getElementById('weightBValue');
+        const financialInfo = document.getElementById('financialInfo');
+        const financialPerspectiveCheckbox = document.getElementById('financialPerspective');
+        
+        if (!weightAElement || !weightBElement || !weightAValueElement || !weightBValueElement) {
+            console.error('No se encontraron los elementos de peso');
+            return { valueA: 0.6, valueB: 0.4 };
+        }
+        
+        // Obtener valores actuales
+        let valueA = parseFloat(weightAElement.value);
+        let valueB = parseFloat(weightBElement.value);
+        
+        // Validar valores numéricos
+        if (isNaN(valueA)) valueA = 0.6;
+        if (isNaN(valueB)) valueB = 0.4;
+        
+        // Actualizar los valores mostrados
+        weightAValueElement.textContent = `${Math.round(valueA * 100)}%`;
+        weightBValueElement.textContent = `${Math.round(valueB * 100)}%`;
+        
+        // Manejar la perspectiva financiera
+        if (financialPerspectiveCheckbox && financialPerspectiveCheckbox.checked) {
+            // Mostrar información financiera
+            if (financialInfo) financialInfo.classList.remove('hidden');
+            
+            // Calcular la suma de pesos
+            const sum = valueA + valueB;
+            let message = '';
+            let messageClass = '';
+            
+            if (sum === 1.0) {
+                message = 'Portfolio tradicional (ej: 60% acciones + 40% bonos)';
+                messageClass = 'text-green-600 dark:text-green-400';
+            } else if (sum < 1.0) {
+                message = `Portfolio + efectivo (${Math.round(sum * 100)}% inversiones + ${Math.round((1 - sum) * 100)}% cash)`;
+                messageClass = 'text-blue-600 dark:text-blue-400';
+            } else if (sum > 1.0) {
+                message = `Portfolio apalancado (${Math.round(sum * 100)}% inversiones, incluyendo ${Math.round((sum - 1) * 100)}% de apalancamiento)`;
+                messageClass = 'text-purple-600 dark:text-purple-400';
+            }
+            
+            // Mostrar mensaje de interpretación
+            let interpretationElement = document.getElementById('weightInterpretation');
+            if (!interpretationElement) {
+                interpretationElement = document.createElement('div');
+                interpretationElement.id = 'weightInterpretation';
+                interpretationElement.className = 'mt-2 text-sm font-medium';
+                weightBElement.parentNode.insertBefore(interpretationElement, weightBElement.nextSibling);
+            }
+            interpretationElement.className = `mt-2 text-sm font-medium ${messageClass}`;
+            interpretationElement.textContent = message;
+            
+            // Resaltar si hay posiciones cortas
+            if (valueA < 0 || valueB < 0) {
+                const shortMessage = '⚠️ Advertencia: Posiciones cortas detectadas (pesos negativos)';
+                if (!document.getElementById('shortPositionWarning')) {
+                    const warningElement = document.createElement('div');
+                    warningElement.id = 'shortPositionWarning';
+                    warningElement.className = 'mt-2 p-2 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 text-sm rounded';
+                    warningElement.textContent = shortMessage;
+                    interpretationElement.parentNode.insertBefore(warningElement, interpretationElement.nextSibling);
+                }
+            } else {
+                const warningElement = document.getElementById('shortPositionWarning');
+                if (warningElement) warningElement.remove();
+            }
+        } else {
+            // Ocultar información financiera si no está activada
+            if (financialInfo) financialInfo.classList.add('hidden');
+            const interpretationElement = document.getElementById('weightInterpretation');
+            if (interpretationElement) interpretationElement.remove();
+            const warningElement = document.getElementById('shortPositionWarning');
+            if (warningElement) warningElement.remove();
+            
+            // Si la perspectiva financiera está desactivada, forzar que sumen 1
+            const total = valueA + valueB;
+            if (total > 0) {
+                const ratio = 1 / total;
+                valueA = valueA * ratio;
+                valueB = valueB * ratio;
+                
+                // Actualizar los valores en los inputs
+                weightAElement.value = valueA.toFixed(2);
+                weightBElement.value = valueB.toFixed(2);
+                weightAValueElement.textContent = `${Math.round(valueA * 100)}%`;
+                weightBValueElement.textContent = `${Math.round(valueB * 100)}%`;
+            }
+        }
+        
+        return { valueA, valueB };
+        
+    } catch (error) {
+        console.error('Error al actualizar pesos:', error);
+        showError('Error al actualizar los pesos del portafolio');
+        return { valueA: 0.6, valueB: 0.4 };
+    }
+}
+
+// Función para configurar los event listeners
+export function setupEventListeners() {
+    // Referencias a los elementos del DOM
+    const runButton = document.getElementById('runSimulation');
+    const weightAInput = document.getElementById('weightA');
+    const weightBInput = document.getElementById('weightB');
+    const financialPerspectiveCheckbox = document.getElementById('financialPerspective');
+    
+    let isSimulationRunning = false;
+
+    // Función para ejecutar la simulación
+    async function executeSimulation() {
+        // Evitar múltiples ejecuciones simultáneas
+        if (isSimulationRunning) {
+            console.log('Simulación ya en progreso, ignorando solicitud');
+            return;
+        }
+        
+        // Configurar estado inicial
+        isSimulationRunning = true;
+        setButtonLoading(runButton, true);
+        
+        // Configurar un timeout de seguridad para evitar bloqueos
+        const safetyTimeout = setTimeout(() => {
+            if (isSimulationRunning) {
+                console.warn('Timeout de seguridad alcanzado, forzando finalización');
+                isSimulationRunning = false;
+                setButtonLoading(runButton, false);
+                showError('La simulación tomó demasiado tiempo. Por favor, intente nuevamente.');
+            }
+        }, 30000); // 30 segundos de timeout
+        
+        try {
+            // Actualizar pesos antes de la simulación
+            updateWeights();
+            
+            // Importar dinámicamente la función de simulación
+            const { runSimulation } = await import('../simulation.js');
+            
+            // Ejecutar la simulación
+            await runSimulation();
+            
+        } catch (error) {
+            console.error('Error en la simulación:', error);
+            showError(`Error al ejecutar la simulación: ${error.message}`);
+        } finally {
+            // Limpiar el timeout y restaurar el estado
+            clearTimeout(safetyTimeout);
+            isSimulationRunning = false;
+            setButtonLoading(runButton, false);
+        }
+    }
+
+    // Configurar eventos
+    if (runButton) {
+        runButton.addEventListener('click', executeSimulation);
+    }
+    
+    if (weightAInput && weightBInput) {
+        // Configurar controles deslizantes
+        weightAInput.min = -1;
+        weightAInput.max = 2;
+        weightAInput.step = 0.1;
+        
+        weightBInput.min = -1;
+        weightBInput.max = 2;
+        weightBInput.step = 0.1;
+        
+        // Actualizar pesos cuando cambian los controles
+        weightAInput.addEventListener('input', updateWeights);
+        weightBInput.addEventListener('input', updateWeights);
+    }
+    
+    // Configurar el checkbox de perspectiva financiera
+    if (financialPerspectiveCheckbox) {
+        financialPerspectiveCheckbox.addEventListener('change', updateWeights);
+    }
+    
+    // Inicializar pesos
+    updateWeights();
+}
+
+// Inicializar los event listeners cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', () => {
+    setupEventListeners();
+});
