@@ -173,9 +173,9 @@ Este simulador demuestra conceptos utilizados en:
 
 ### 🔗 **DEPLOY EN VIVO**
 
-- Netlify: [Próximamente]
-- GitHub Pages: [Próximamente]
-- Vercel: [Próximamente]
+- Netlify: [(https://davidhospinal-portfolio-valeator.netlify.app/)]
+- GitHub Pages: [https://davidhospinal.github.io/Portfolio-Simulator/]
+- Vercel: [https://davidhospinal-portfolio-simulator.vercel.app/]
 
 ### 👨‍💻 **AUTOR**
 **David H'spinal**
@@ -202,8 +202,8 @@ Las contribuciones son bienvenidas. Por favor:
 ### 📞 **SOPORTE**
 Para preguntas o sugerencias:
 
-- 📧 Email: [tu-email]
-- 💬 Issues: [GitHub Issues](https://github.com/DavidHospinal/Portfolio-Simulator/issues)
+
+- 💬 GitLab: [GitHub Issues](https://gitlab.com/david.hospinal)
 - 📱 Twitter: [@DavidHspinal](https://twitter.com/DavidHspinal)
 
 
