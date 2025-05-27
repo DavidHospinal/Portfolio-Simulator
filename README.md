@@ -171,11 +171,11 @@ Este simulador demuestra conceptos utilizados en:
 - Modelos de riesgo bancarios
 - Trading algorítmico
 
-### 🔗 **DEPLOY EN VIVO**
+### 🌐 **DEPLOYMENTS**
 
-- Netlify: [(https://davidhospinal-portfolio-valeator.netlify.app/)]
-- GitHub Pages: [https://davidhospinal.github.io/Portfolio-Simulator/]
-- Vercel: [https://davidhospinal-portfolio-simulator.vercel.app/]
+- 🟠 **Netlify**: [davidhospinal-portfolio-valeator.netlify.app](https://davidhospinal-portfolio-valeator.netlify.app/)
+- 🐱 **GitHub Pages**: [davidhospinal.github.io/Portfolio-Simulator](https://davidhospinal.github.io/Portfolio-Simulator/)
+- ▲ **Vercel**: [davidhospinal-portfolio-simulator.vercel.app](https://davidhospinal-portfolio-simulator.vercel.app/)
 
 ### 👨‍💻 **AUTOR**
 **David H'spinal**
@@ -200,11 +200,10 @@ Las contribuciones son bienvenidas. Por favor:
 5. Abre un Pull Request
 
 ### 📞 **SOPORTE**
-Para preguntas o sugerencias:
+Para preguntas, sugerencias o contribuciones:
 
-
-- 💬 GitLab: [GitHub Issues](https://gitlab.com/david.hospinal)
-- 📱 Twitter: [@DavidHspinal](https://twitter.com/DavidHspinal)
+- 🦊 **GitLab**: [david.hospinal](https://gitlab.com/david.hospinal)
+- 𝕏 **Twitter/X**: [@DavidHspinal](https://twitter.com/DavidHspinal)
 
 
 ⭐ Si este proyecto te resulta útil, ¡no olvides darle una estrella en GitHub!
