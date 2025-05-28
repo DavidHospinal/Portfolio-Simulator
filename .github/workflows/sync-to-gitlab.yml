@@ -18,6 +18,6 @@ jobs:
     
     - name: Sync to GitLab
       run: |
-        git remote add gitlab https://oauth2:${{ secrets.GITLAB_TOKEN }}@gitlab.com/david.hospinal/portfolio-simulator-sync.git
+        git remote add gitlab https://gitlab-ci-token:${{ secrets.GITLAB_TOKEN }}@gitlab.com/david.hospinal/portfolio-simulator-sync.git
         git push gitlab --all --force
         git push gitlab --tags --force
