@@ -1,5 +1,7 @@
 # 📊 Portfolio Simulator - Variables Aleatorias
 ## Simulador de Portfolio de Inversiones con Análisis de Riesgo
+![AnimationVI](https://github.com/user-attachments/assets/af32e403-2e76-4292-89b9-1f2e9f3de89a)
+
 
 ### 🎯 **DESCRIPCIÓN DEL PROYECTO**
 
