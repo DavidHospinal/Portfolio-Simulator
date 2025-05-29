@@ -9,6 +9,7 @@
 - **Aplicación**: Optimizar la combinación para minimizar riesgo y maximizar retorno
 
 ### 🧮 **FUNDAMENTOS MATEMÁTICOS**
+![image](https://github.com/user-attachments/assets/f18fb7a2-c830-4962-a268-6c616271aab9)
 
 #### **Variables Aleatorias Independientes**
 - **Activo X ~ N(μₓ, σₓ²)**: Representa el retorno de un activo financiero
